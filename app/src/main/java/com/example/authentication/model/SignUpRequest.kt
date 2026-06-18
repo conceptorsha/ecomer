@@ -6,7 +6,7 @@ data class SignupRequest(
 )
 
 data class SignupResponse(
-    val id: String,
+    val id: Int,
     val token: String?,
     val error: String?
 )
