@@ -1,6 +1,5 @@
 package com.example.authentication.auth
 
-import android.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,38 +9,51 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.authentication.viewModel.AuthViewModel
 
 @Composable
-fun SignUpScreen(navController : NavController){
-    var fullName by remember { mutableStateOf("") }
+fun SignUpScreen(navController: NavController, viewModel: AuthViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var fullNameError  by remember{mutableStateOf(true)}
-    var fullNameErrorMessage by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf(false) }
     var emailErrorMessage by remember { mutableStateOf("") }
-    var emailError by remember { mutableStateOf(true) }
-    var passwordError   by remember { mutableStateOf(true) }
+    var passwordError by remember { mutableStateOf(false) }
     var passwordErrorMessage by remember { mutableStateOf("") }
-    var phoneNumberError   by remember { mutableStateOf(true) }
-    var phoneNumberErrorMessage by remember { mutableStateOf("") }
+
+    val signupResponse by viewModel.signupResponse.observeAsState()
+    val error by viewModel.error.observeAsState()
+
+    LaunchedEffect(signupResponse) {
+        if (signupResponse?.token != null) {
+            navController.navigate("login")
+        }
+    }
+
+    LaunchedEffect(error) {
+        error?.let {
+            emailError = true
+            emailErrorMessage = it
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -58,99 +70,61 @@ fun SignUpScreen(navController : NavController){
             color = Color.Green
         )
         TextField(
-            value = fullName,
-            onValueChange = {fullName = it},
-            label = {Text("FullName")},
-            modifier = Modifier
-                .padding( 16.dp)
-                .fillMaxWidth(),
-            shape = CircleShape,
-
-            supportingText = {
-                if (fullNameError) {
-                   Text (fullNameErrorMessage)
-                }
-            }
-        )
-      TextField(
             value = email,
-            onValueChange = {email = it
-                            },
-            label = {Text("email")},
+            onValueChange = {
+                email = it
+                emailError = false
+            },
+            label = { Text("Email") },
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
             shape = CircleShape,
-
-
-            supportingText =  {
-                if (emailError){
-                    (emailErrorMessage) }
+            isError = emailError,
+            supportingText = {
+                if (emailError) Text(emailErrorMessage)
             }
-        )
-        TextField(
-            value = phoneNumber,
-            onValueChange = {phoneNumber = it},
-            label = {Text("PhoneNumber")},
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            shape = CircleShape,
-            supportingText =  {if (phoneNumberError){
-                (phoneNumberErrorMessage)
-            } }
         )
         TextField(
             value = password,
             visualTransformation = PasswordVisualTransformation(),
-            onValueChange = {password = it},
-            label = {Text("password")},
+            onValueChange = {
+                password = it
+                passwordError = false
+            },
+            label = { Text("Password") },
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
             shape = CircleShape,
-
-            supportingText =  {if (passwordError) {
-                (passwordErrorMessage)
-            } }
+            isError = passwordError,
+            supportingText = {
+                if (passwordError) Text(passwordErrorMessage)
+            }
         )
         Button(
             onClick = {
-                if (fullName.isEmpty()){
-                    fullNameError = true
-                    fullNameErrorMessage = "enter full name"
-                }else if (email.isEmpty()){
+                if (email.isEmpty()) {
                     emailError = true
-                        emailErrorMessage = "enter email"
-                    } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                    emailErrorMessage = "Enter email"
+                } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     emailError = true
-                    emailErrorMessage = "enter a valid email"
-                    }else if (phoneNumber.isEmpty()){
-                        phoneNumberError = true
-                        phoneNumberErrorMessage = "enter number"
-                    }else if (password.isEmpty()){
-                        passwordError = true
-                        passwordErrorMessage = "enter password"
-                    }else {
-                    fullNameError = false
+                    emailErrorMessage = "Enter a valid email"
+                } else if (password.isEmpty()) {
+                    passwordError = true
+                    passwordErrorMessage = "Enter password"
+                } else {
                     emailError = false
-                    phoneNumberError = false
                     passwordError = false
-
-                    navController.navigate("Login" )
-                    }
-
-
+                    viewModel.signup(email, password)
+                }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(50.dp),
-            shape = CircleShape,
-
-
-
+            shape = CircleShape
         ) {
             Text("SIGN UP")
         }
-
     }
 }

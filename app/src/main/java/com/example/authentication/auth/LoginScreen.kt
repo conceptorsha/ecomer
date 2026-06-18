@@ -12,7 +12,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -21,16 +23,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.authentication.viewModel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController : NavController){
+fun LoginScreen(navController : NavController, viewModel: AuthViewModel = viewModel() ){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var emailError  by remember { mutableStateOf(false) }
     var emailErrorMessage by remember { mutableStateOf("") }
     var passwordError by remember {mutableStateOf(false)}
     var passwordErrorMessage by remember { mutableStateOf("") }
+    val loginResponse by viewModel.loginResponse.observeAsState()
+    val error by viewModel.error.observeAsState()
+    LaunchedEffect(loginResponse) {
+        if (loginResponse?.token != null) {
+            navController.navigate("home")
+        }
+    }
+
+    LaunchedEffect(error) {
+        error?.let {
+            emailError = true
+            emailErrorMessage = it
+        }
+    }
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(24.dp),
@@ -98,7 +116,7 @@ fun LoginScreen(navController : NavController){
         }else {
                 emailError = false
                 passwordError = false
-                navController.navigate("home")
+                viewModel.login(email, password)
             }
         },
             modifier = Modifier

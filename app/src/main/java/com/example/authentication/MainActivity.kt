@@ -25,15 +25,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             AuthenticationTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController,startDestination= "sign up"){
-                    composable(route = "sign up"){
+                NavHost(navController = navController, startDestination = "signup") {
+                    composable(route = "signup") {
                         SignUpScreen(navController = navController)
                     }
-                    composable(route ="login") {
+                    composable(route = "login") {
                         LoginScreen(navController = navController)
                     }
-                    composable(route= "home" ){
-                      HomeScreen()
+                    composable(route = "home") {
+                        HomeScreen()
                     }
                 }
 
