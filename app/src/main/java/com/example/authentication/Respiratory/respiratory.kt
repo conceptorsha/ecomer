@@ -11,11 +11,11 @@ class AuthRepository {
 
     private val api = RetrofitInstance.api
 
-    suspend fun login(email: String, password: String): Response<LoginResponse> { // ✅
+    suspend fun login(email: String, password: String): Response<LoginResponse> {
         return api.login(LoginRequest(email, password))
     }
 
-    suspend fun signup(email: String, password: String): Response<SignupResponse> { // ✅
+    suspend fun signup(email: String, password: String): Response<SignupResponse> {
         return api.signup(SignupRequest(email, password))
     }
 }

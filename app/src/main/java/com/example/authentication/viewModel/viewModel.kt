@@ -33,12 +33,12 @@ class AuthViewModel : ViewModel() {
                 Log.d("AUTH", "Attempting login with email: $email")
                 val response = repository.login(email, password)
                 Log.d("AUTH", "Login code: ${response.code()}")
-                if (response.isSuccessful) {                    // ✅ check isSuccessful
+                if (response.isSuccessful) {
                     val body = response.body()
                     if (body?.error != null) {
-                        _error.postValue(body.error)            // ✅ body.error
+                        _error.postValue(body.error)
                     } else {
-                        _loginResponse.postValue(body)          // ✅ body not response
+                        _loginResponse.postValue(body)
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()
@@ -61,12 +61,12 @@ class AuthViewModel : ViewModel() {
                 Log.d("AUTH", "Attempting signup with email: $email")
                 val response = repository.signup(email, password)
                 Log.d("AUTH", "Signup code: ${response.code()}")
-                if (response.isSuccessful) {                    // ✅ check isSuccessful
+                if (response.isSuccessful) {
                     val body = response.body()
                     if (body?.error != null) {
-                        _error.postValue(body.error)            // ✅ body.error
+                        _error.postValue(body.error)
                     } else {
-                        _signupResponse.postValue(body)         // ✅ body not response
+                        _signupResponse.postValue(body)
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()

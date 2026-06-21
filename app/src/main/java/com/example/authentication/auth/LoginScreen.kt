@@ -35,8 +35,10 @@ fun LoginScreen(navController : NavController, viewModel: AuthViewModel = viewMo
     var emailErrorMessage by remember { mutableStateOf("") }
     var passwordError by remember {mutableStateOf(false)}
     var passwordErrorMessage by remember { mutableStateOf("") }
+    //vie model variable
     val loginResponse by viewModel.loginResponse.observeAsState()
     val error by viewModel.error.observeAsState()
+
     LaunchedEffect(loginResponse) {
         if (loginResponse?.token != null) {
             navController.navigate("home")
