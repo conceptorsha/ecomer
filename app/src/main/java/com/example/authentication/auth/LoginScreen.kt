@@ -29,13 +29,17 @@ import com.example.authentication.viewModel.AuthViewModel
 
 @Composable
 fun LoginScreen(navController : NavController, viewModel: AuthViewModel = viewModel() ){
-    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var emailError  by remember { mutableStateOf(false) }
-    var emailErrorMessage by remember { mutableStateOf("") }
+    var username by remember {mutableStateOf("")}
+
+    // error logic variables
+
     var passwordError by remember {mutableStateOf(false)}
     var passwordErrorMessage by remember { mutableStateOf("") }
-    //vie model variable
+    var usernameError by remember {mutableStateOf(false)}
+    var usernameErrorMessage  by remember {mutableStateOf("")}
+
+    //viewmodel variable
     val loginResponse by viewModel.loginResponse.observeAsState()
     val error by viewModel.error.observeAsState()
 
@@ -47,13 +51,15 @@ fun LoginScreen(navController : NavController, viewModel: AuthViewModel = viewMo
 
     LaunchedEffect(error) {
         error?.let {
-            emailError = true
-            emailErrorMessage = it
+            usernameError = true
+            usernameErrorMessage = it
         }
     }
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .padding(24.dp),
+
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -63,26 +69,20 @@ fun LoginScreen(navController : NavController, viewModel: AuthViewModel = viewMo
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 32.dp)
         )
+
         TextField(
-            value = email,
-            onValueChange = {
-                email = it
-
-
-            },
-            label = {Text("email")},
-            isError = emailError,
-            supportingText = {
-                if (emailError) {
-                    Text(emailErrorMessage)
-                }
-            },
+            value =username,
+            onValueChange = {username = it
+                            usernameError =  false},
+            label = {Text("username")},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
+            isError = usernameError,
+            supportingText = {if (usernameError){
+               Text (usernameErrorMessage)
+            }},
             singleLine = true
-
-
         )
         TextField(
             value = password,
@@ -90,7 +90,7 @@ fun LoginScreen(navController : NavController, viewModel: AuthViewModel = viewMo
                 password = it
                 passwordError = false
             },
-            label = {Text("enterpassword")},
+            label = {Text("enter password")},
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
@@ -105,20 +105,18 @@ fun LoginScreen(navController : NavController, viewModel: AuthViewModel = viewMo
 
         )
         Button(onClick = {
-            if (email.isEmpty()){
-                emailError = true
-                emailErrorMessage= "enter valid email"
-            }
-            else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailError = true
-            emailErrorMessage = "Not a valid email address"
+            if (username.isEmpty()){
+                usernameError = true
+                usernameErrorMessage= "enter valid email"
+
+
         }else if (password.isEmpty()){
             passwordError = true
                 passwordErrorMessage = "please enter password"
         }else {
-                emailError = false
+                usernameError = false
                 passwordError = false
-                viewModel.login(email, password)
+                viewModel.login(username, password)
             }
         },
             modifier = Modifier
