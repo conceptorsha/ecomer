@@ -1,5 +1,6 @@
-package com.example.authentication
+package com.example.authentication.authScreens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -9,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -22,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.authentication.model.ProductsResponse
 import com.example.authentication.viewModel.AuthViewModel
@@ -29,7 +33,7 @@ import com.example.authentication.viewModel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: AuthViewModel = viewModel()) {
+fun HomeScreen(navController: NavController, viewModel: AuthViewModel = viewModel()) {
     var searchText by remember { mutableStateOf("") }
     val products by viewModel.productsResponse.observeAsState(emptyList())
     val isLoading by viewModel.isLoading.observeAsState(false)
@@ -108,7 +112,12 @@ fun HomeScreen(viewModel: AuthViewModel = viewModel()) {
                             .padding(15.dp)
                     ) {
                         items(products) { product ->
-                            ProductCard(product)
+                            ProductCard(
+                                product = product,
+                                onClick = {
+                                    navController.navigate("productDetail/${product.id}")
+                                }
+                            )
                         }
                     }
                 }
@@ -119,11 +128,13 @@ fun HomeScreen(viewModel: AuthViewModel = viewModel()) {
 
 
 @Composable
-fun ProductCard(product: ProductsResponse) {
+fun ProductCard(product: ProductsResponse, onClick: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFEFB8C8)),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -149,14 +160,33 @@ fun ProductCard(product: ProductsResponse) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = product.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
-                    maxLines = if (expanded) Int.MAX_VALUE else 3,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.clickable { expanded = !expanded }
-                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = !expanded },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Description",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.DarkGray
+                    )
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = if (expanded) "Collapse" else "Expand"
+                    )
+                }
+
+                AnimatedVisibility(visible = expanded) {
+                    Text(
+                        text = product.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
         }
     }

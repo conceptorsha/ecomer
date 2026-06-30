@@ -1,4 +1,4 @@
-package com.example.authentication.auth
+package com.example.authentication.authScreens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -91,6 +92,10 @@ fun SignUpScreen(navController: NavController, viewModel: AuthViewModel = viewMo
             onValueChange = { email = it
                 emailError = false},
             label = {Text("email")},
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                capitalization = KeyboardCapitalization.None
+            ),
             isError = emailError,
             supportingText = {
                 if (emailError) {
@@ -101,8 +106,6 @@ fun SignUpScreen(navController: NavController, viewModel: AuthViewModel = viewMo
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
             singleLine = true
-
-
         )
         TextField(
             value =username,

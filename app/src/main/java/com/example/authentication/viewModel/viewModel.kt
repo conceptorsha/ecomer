@@ -5,18 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.authentication.Respiratory.AuthRepository
+import com.example.authentication.Repository.AuthRepository
 import com.example.authentication.model.LoginResponse
 import com.example.authentication.model.SignupResponse
 import com.example.authentication.model.ProductsResponse
-import com.example.authentication.remote.RetrofitInstance
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
-    init {
-        getProducts()
-    }
+
     private val repository = AuthRepository()
 
     private val _loginResponse = MutableLiveData<LoginResponse?>()
@@ -36,7 +32,9 @@ class AuthViewModel : ViewModel() {
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
-
+    init {
+        getProducts()
+    }
     fun login(username: String, password: String) {
 
         viewModelScope.launch {

@@ -1,4 +1,4 @@
-package com.example.authentication.Respiratory
+package com.example.authentication.Repository
 
 import com.example.authentication.model.LoginRequest
 import com.example.authentication.model.LoginResponse
